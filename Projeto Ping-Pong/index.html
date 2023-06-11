@@ -75,6 +75,12 @@
       const score = {
         human: 1,
         computer: 2,
+        increseHuman: Function() {
+          this.human++
+        },
+        increseComputer: Function() {
+          this.computer++
+        },
         draw: function () {
           canvasCtx.font = "bold 72px Arial"
           canvasCtx.textAlign = "center"
@@ -93,6 +99,21 @@
         directionX: 1,
         directionY: 1,
         _calcPosition: function () {
+          // verifica se o jogador 1 fez um ponto (x > Largura do campo)
+
+          if(this.x > field.w) {
+            if (this.y + this.r > rightPaddle.y && this.y - this.r < rightPaddle.y + rightPaddle.h
+            ) {
+              // rebate a bola invertendo o sinal de X
+              this._reverseX()
+            } else {
+              // Pontuar o jogador 1
+              score.increseHuman()
+            }
+          }
+
+
+
           // verifica as laterais superior e inferior do campo
           if (
             (this.y - this.r < 0 && this.directionY < 0) ||
