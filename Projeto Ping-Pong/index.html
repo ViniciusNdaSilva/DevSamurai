@@ -61,24 +61,31 @@
         y: 0,
         w: line.w,
         h: 200,
+        speed: 5,
         _move: function () {
-          this.y = ball.y
+          if (this.y + this.h / 2 < ball.y + ball.r) {
+            this.y += this.speed
+          } else {
+            this.y -= this.speed
+          }
+        },
+        speedUp: function () {
+          this.speed += 2
         },
         draw: function () {
           canvasCtx.fillStyle = "#ffffff"
           canvasCtx.fillRect(this.x, this.y, this.w, this.h)
-
           this._move()
         },
       }
 
       const score = {
-        human: 1,
-        computer: 2,
-        increseHuman: Function() {
+        human: 0,
+        computer: 0,
+        increaseHuman: function () {
           this.human++
         },
-        increseComputer: Function() {
+        increaseComputer: function () {
           this.computer++
         },
         draw: function () {
@@ -92,27 +99,44 @@
       }
 
       const ball = {
-        x: 0,
-        y: 0,
+        x: field.w / 2,
+        y: field.h / 2,
         r: 20,
         speed: 5,
         directionX: 1,
         directionY: 1,
         _calcPosition: function () {
-          // verifica se o jogador 1 fez um ponto (x > Largura do campo)
-
-          if(this.x > field.w) {
-            if (this.y + this.r > rightPaddle.y && this.y - this.r < rightPaddle.y + rightPaddle.h
+          // verifica se o jogador 1 fez um ponto (x > largura do campo)
+          if (this.x > field.w - this.r - rightPaddle.w - gapX) {
+            // verifica se a raquete direita está na posição y da bola
+            if (
+              this.y + this.r > rightPaddle.y &&
+              this.y - this.r < rightPaddle.y + rightPaddle.h
             ) {
-              // rebate a bola invertendo o sinal de X
+              // rebate a bola intervertendo o sinal de X
               this._reverseX()
             } else {
-              // Pontuar o jogador 1
-              score.increseHuman()
+              // pontuar o jogador 1
+              score.increaseHuman()
+              this._pointUp()
             }
           }
 
-
+          // verifica se o jogador 2 fez um ponto (x < 0)
+          if (this.x < this.r + leftPaddle.w + gapX) {
+            // verifica se a raquete esquerda está na posição y da bola
+            if (
+              this.y + this.r > leftPaddle.y &&
+              this.y - this.r < leftPaddle.y + leftPaddle.h
+            ) {
+              // rebate a bola intervertendo o sinal de X
+              this._reverseX()
+            } else {
+              // pontuar o jogador 2
+              score.increaseComputer()
+              this._pointUp()
+            }
+          }
 
           // verifica as laterais superior e inferior do campo
           if (
@@ -132,6 +156,16 @@
           // 1 * -1 = -1
           // -1 * -1 = 1
           this.directionY *= -1
+        },
+        _speedUp: function () {
+          this.speed += 2
+        },
+        _pointUp: function () {
+          this._speedUp()
+          rightPaddle.speedUp()
+
+          this.x = field.w / 2
+          this.y = field.h / 2
         },
         _move: function () {
           this.x += this.directionX * this.speed
